@@ -1,19 +1,22 @@
-const express = require('express');
-const app = express();
+const express = require('express')
+const app = express()
+var cb = require('./happy-cow');
 
-var scraping = require('./scraping');
+app.set('port', (8080))
+app.use(express.static(__dirname + '/public'))
 
-app.get('/projects/:type?', function (req, res) {
-  scraping.getProjects(req.param('type')).then(function(data) {
-      res.status(200).json(data);
-  }, function(err) {
-      res.status(400).json(err);
-  });
+app.get('/places/:page', function(request, response) {
+  places(request, response)
+})
+
+app.listen(app.get('port'), function() {
+  console.log("Node app is running at localhost:" + app.get('port'))
+})
+
+function places(request, response) {
+	cb.places(request.params.serie).then(function(places) {
+	response.send(places);
+}, function(err){
+	response.send(err);
 });
-
-var server = app.listen(3000, function () {
-  var host = server.address().address;
-  var port = server.address().port;
-  console.log('API running on http://%s:%s', host, port);
-});
-view raw
+}
